@@ -1,0 +1,105 @@
+#EXTM3U
+#EXTINF:0,ZDF HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2001
+dvb-t2://frequency=570000000:bandwidth=8
+#EXTINF:0,ZDFinfo HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2002
+dvb-t2://frequency=570000000:bandwidth=8
+#EXTINF:0,zdf_neo HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2003
+dvb-t2://frequency=570000000:bandwidth=8
+#EXTINF:0,3sat HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2004
+dvb-t2://frequency=570000000:bandwidth=8
+#EXTINF:0,KiKA HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2005
+dvb-t2://frequency=570000000:bandwidth=8
+#EXTINF:0,Das Erste HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=769
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,tagesschau24 HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=772
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,MDR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=865
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,NDR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=897
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,rbb Berlin HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=945
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,rbb Brandenburg HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=946
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,SWR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=993
+dvb-t2://frequency=506000000:bandwidth=8
+#EXTINF:0,arte HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=770
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,phoenix HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=771
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,ONE HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=773
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,BR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=801
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,HR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=833
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,WDR HD
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=1030
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,alpha Infotafel
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=1571
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,Inforadio Infotafel
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=1718
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,Cosmo Infotafel
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=2065
+dvb-t2://frequency=626000000:bandwidth=8
+#EXTINF:0,FreeNet QVC
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=16966
+dvb-t2://frequency=642000000:bandwidth=8
+#EXTINF:0,HSE24
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=16967
+dvb-t2://frequency=642000000:bandwidth=8
+#EXTINF:0,bibelTV
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=16968
+dvb-t2://frequency=642000000:bandwidth=8
+#EXTINF:0,123 TV
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=16965
+dvb-t2://frequency=642000000:bandwidth=8
+#EXTINF:0,QVC2 TV
+#EXTVLCOPT:dvb-adapter=3
+#EXTVLCOPT:program=16970
+dvb-t2://frequency=642000000:bandwidth=8
