@@ -10,6 +10,7 @@ https://bitbucket.org/powARman/dvbhddevice/src/master/
 
 https://github.com/rofafor/vdr-plugin-satip
 https://github.com/gentoo/gentoo/pull/18919
+https://github.com/gentoo/gentoo/tree/master/media-video/vdr
 
 ## Patches Fedora
 
