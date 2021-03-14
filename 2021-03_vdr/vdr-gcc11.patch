@@ -1,0 +1,21 @@
+diff --git a/recording.c b/recording.c
+index e493b57..e50ef7d 100644
+--- a/recording.c
++++ b/recording.c
+@@ -3025,7 +3025,15 @@ cUnbufferedFile *cFileName::SetOffset(int Number, off_t Offset)
+            }
+         // found a non existing file suffix
+         }
+-     if (Open() >= 0) {
++     /* This used to test Open() >= 0, but Open() returns a pointer
++	and we shouldn't be doing ordered comparisons of pointers
++	against constants.  Furthermore, on some systems pointers
++	are unsigned meaning this test always succeeded. 
++
++	Finally, AFAICT Open() is always going to return NULL or a
++	valid pointer and can never return a negative value based on my
++	reading of these sources.  */
++     if (1) {
+         if (!record && Offset >= 0 && file && file->Seek(Offset, SEEK_SET) != Offset) {
+            LOG_ERROR_STR(fileName);
+            return NULL;
