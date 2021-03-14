@@ -1,0 +1,109 @@
+diff --git a/libs/libv4l/Makefile b/libs/libv4l/Makefile
+index 181fe529c..75c3d08ac 100644
+--- a/libs/libv4l/Makefile
++++ b/libs/libv4l/Makefile
+@@ -50,7 +50,7 @@ define Package/libv4l
+   SECTION:=libs
+   CATEGORY:=Libraries
+   TITLE+= wrapper libraries
+-  DEPENDS := +libpthread +librt $(ICONV_DEPENDS)
++  DEPENDS := +libpthread +librt $(ICONV_DEPENDS) +libudev-zero
+   LICENSE:=LGPL-2.1-or-later
+   LICENSE_FILES:=COPYING.libv4l
+ endef
+@@ -64,7 +64,7 @@ define Package/v4l-utils
+   SECTION:=utils
+   CATEGORY:=Utilities
+   TITLE+= utilities
+-  DEPENDS:= +libv4l +libstdcpp $(ICONV_DEPENDS) $(INTL_DEPENDS)
++  DEPENDS:= +libv4l +libstdcpp $(ICONV_DEPENDS) $(INTL_DEPENDS) +libudev-zero
+   LICENSE:=GPL-2.0-or-later
+   LICENSE_FILES:=COPYING
+ endef
+@@ -83,8 +83,8 @@ TARGET_LDFLAGS += \
+ CONFIGURE_ARGS+= \
+ 	--disable-bpf \
+ 	--disable-doxygen-doc \
+-	--disable-libdvbv5 \
+ 	--disable-qv4l2 \
++	--enable-libdvbv5 \
+ 	--disable-qvidcap \
+ 	--without-jpeg
+ 
+@@ -95,11 +95,13 @@ define Build/InstallDev
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libv4l{1,2,convert,2rds}.{a,so*} $(1)/usr/lib/
+ 	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libv4l{1,2,convert,2rds}.pc $(1)/usr/lib/pkgconfig/
++	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libdvbv5.pc $(1)/usr/lib/pkgconfig/
+ endef
+ 
+ define Package/libv4l/install
+ 	$(INSTALL_DIR) $(1)/usr/lib
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libv4l{1,2,convert,2rds}.so.* $(1)/usr/lib/
++	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libdvbv5.so.* $(1)/usr/lib/
+ 	$(INSTALL_DIR) $(1)/usr/lib/libv4l
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libv4l/v4l{1compat,2convert}.so $(1)/usr/lib/libv4l/
+ endef
+@@ -114,6 +116,8 @@ define Package/v4l-utils/install
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/bin/ir-{ctl,keytable} $(1)/usr/bin/
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/bin/v4l2-{compliance,ctl,sysfs-path} $(1)/usr/bin/
+ 	$(CP) $(PKG_INSTALL_DIR)/usr/bin/cec-{compliance,ctl,follower} $(1)/usr/bin/
++	$(CP) $(PKG_INSTALL_DIR)/usr/bin/dvbv5-{daemon,scan,zap} $(1)/usr/bin/
++	$(CP) $(PKG_INSTALL_DIR)/usr/bin/dvb-{fe-tool,format-convert} $(1)/usr/bin/
+ endef
+ 
+ $(eval $(call BuildPackage,libv4l))
+diff --git a/libs/libv4l/patches/010-remove-libudev-check.patch b/libs/libv4l/patches/010-remove-libudev-check.patch
+deleted file mode 100644
+index 56e51fa77..000000000
+--- a/libs/libv4l/patches/010-remove-libudev-check.patch
++++ /dev/null
+@@ -1,22 +0,0 @@
+---- a/configure.ac
+-+++ b/configure.ac
+-@@ -291,16 +291,9 @@ else
+-    AC_MSG_WARN(ALSA library not available)
+- fi
+- 
+--PKG_CHECK_MODULES(libudev, libudev, have_libudev=yes, have_libudev=no)
+--if test "x$have_libudev" = "xyes"; then
+--	AC_DEFINE([HAVE_LIBUDEV], [], [Use libudev])
+--	LIBUDEV_CFLAGS="$libudev_CFLAGS"
+--	LIBUDEV_LIBS="$libudev_LIBS"
+--	AC_SUBST(LIBUDEV_CFLAGS)
+--	AC_SUBST(LIBUDEV_LIBS)
+--else
+--   AC_MSG_WARN(udev library not available)
+--fi
+-+
+-+# Force building without udev
+-+have_libudev=no
+- 
+- AC_SUBST([JPEG_LIBS])
+- 
+diff --git a/multimedia/gerbera/Makefile b/multimedia/gerbera/Makefile
+index c84e620d0..7349b501c 100644
+--- a/multimedia/gerbera/Makefile
++++ b/multimedia/gerbera/Makefile
+@@ -30,7 +30,7 @@ include $(INCLUDE_DIR)/nls.mk
+ define Package/gerbera
+   SECTION:=multimedia
+   CATEGORY:=Multimedia
+-  DEPENDS:=+file +libnpupnp +libsqlite3 +libexif +libuuid +libfmt +BUILD_PATENTED:libffmpeg $(ICONV_DEPENDS)
++  DEPENDS:=+file +libnpupnp +libsqlite3 +libexif +libuuid +libfmt +BUILD_PATENTED:libffmpeg $(ICONV_DEPENDS) +pugixml
+   TITLE:=A free media server
+   URL:=https://gerbera.io
+   USERID:=gerbera:gerbera
+diff --git a/multimedia/imagemagick/Makefile b/multimedia/imagemagick/Makefile
+index 6397be753..4bec738c2 100644
+--- a/multimedia/imagemagick/Makefile
++++ b/multimedia/imagemagick/Makefile
+@@ -23,6 +23,8 @@ PKG_CPE_ID:=cpe:/a:imagemagick:imagemagick
+ PKG_USE_MIPS16:=0
+ PKG_INSTALL:=1
+ 
++PKG_FIXUP:=autoreconf
++
+ include $(INCLUDE_DIR)/package.mk
+ 
+ define Package/imagemagick/Default
