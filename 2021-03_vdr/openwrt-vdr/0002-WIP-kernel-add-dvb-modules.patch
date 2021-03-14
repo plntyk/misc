@@ -1,0 +1,286 @@
+From d817516948fe38b6ea3c111d1fe86efc91f9409a Mon Sep 17 00:00:00 2001
+From: Dirk Neukirchen <dirkneukirchen@web.de>
+Date: Mon, 8 Mar 2021 19:47:29 +0100
+Subject: [PATCH 2/2] WIP kernel: add dvb modules
+
+Signed-off-by: Dirk Neukirchen <dirkneukirchen@web.de>
+---
+ package/firmware/dvb-firmware/Makefile |  48 ++++++
+ package/kernel/linux/modules/dvb.mk    | 210 +++++++++++++++++++++++++
+ 2 files changed, 258 insertions(+)
+ create mode 100644 package/firmware/dvb-firmware/Makefile
+ create mode 100644 package/kernel/linux/modules/dvb.mk
+
+diff --git a/package/firmware/dvb-firmware/Makefile b/package/firmware/dvb-firmware/Makefile
+new file mode 100644
+index 0000000000..6901d2e8ba
+--- /dev/null
++++ b/package/firmware/dvb-firmware/Makefile
+@@ -0,0 +1,48 @@
++#
++
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=dvb-firmware
++PKG_SOURCE_DATE:=2017-03-28
++PKG_RELEASE:=$(AUTORELEASE)
++
++PKG_SOURCE_PROTO:=git
++PKG_SOURCE_URL:=https://github.com/OpenELEC/dvb-firmware.git
++PKG_MIRROR_HASH:=74149633cdf80f33c1ce46e550cb852f319f2c48235b9fa49bf873a9ee28feba
++PKG_SOURCE_VERSION:=195c17aab2ed7efae8292a2f877e340e6942e8d4
++PKG_MAINTAINER:=me
++
++
++include $(INCLUDE_DIR)/package.mk
++
++define Package/dvb-firmware
++  SECTION:=firmware
++  CATEGORY:=Firmware
++  TITLE:=DVB Firmware
++  DEPENDS:=@(TARGET_x86_64||TARGET_x86)
++  URL:=https://github.com/OpenELEC/dvb-firmware
++endef
++
++define Package/dvb-firmware-af9005
++  SECTION:=firmware
++  CATEGORY:=Firmware
++  TITLE:=DVB Firmware for af9005 dvb-t
++  DEPENDS:=@(TARGET_x86_64||TARGET_x86)
++  URL:=https://github.com/OpenELEC/dvb-firmware
++endef
++
++define Build/Compile
++endef
++
++define Package/dvb-firmware/install
++	$(INSTALL_DIR) $(1)/lib/firmware/
++	$(INSTALL_DATA) $(PKG_BUILD_DIR)/firmware/af9005.fw $(1)/lib/firmware
++endef
++
++define Package/dvb-firmware-af9005/install
++	$(INSTALL_DIR) $(1)/lib/firmware/
++	$(INSTALL_DATA) $(PKG_BUILD_DIR)/firmware/af9005.fw $(1)/lib/firmware
++endef
++
++$(eval $(call BuildPackage,dvb-firmware))
++$(eval $(call BuildPackage,dvb-firmware-af9005))
+diff --git a/package/kernel/linux/modules/dvb.mk b/package/kernel/linux/modules/dvb.mk
+new file mode 100644
+index 0000000000..74c222d440
+--- /dev/null
++++ b/package/kernel/linux/modules/dvb.mk
+@@ -0,0 +1,210 @@
++#
++#
++#
++
++DVB_MENU:=DVB Support
++
++define KernelPackage/dvb-core
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-core
++KCONFIG:=CONFIG_DVB_CORE
++DEPENDS:=+kmod-video-core
++FILES:=$(LINUX_DIR)/drivers/media/dvb-core/dvb-core.ko
++AUTOLOAD:=$(call AutoProbe,dvb-core)
++endef
++
++
++define KernelPackage/rc-core
++SUBMENU:=$(DVB_MENU)
++TITLE:=rc-core
++KCONFIG:=CONFIG_RC_CORE
++DEPENDS:=+kmod-input-core
++FILES:=$(LINUX_DIR)/drivers/media/rc/rc-core.ko
++AUTOLOAD:=$(call AutoProbe,rc-core)
++endef
++
++
++define KernelPackage/dvb-usb
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-usb
++KCONFIG:=CONFIG_DVB_USB \
++	CONFIG_DVB_USB_DEBUG=n \
++	CONFIG_CYPRESS_FIRMWARE
++DEPENDS:=+kmod-dvb-core +kmod-i2c-core +kmod-rc-core @USB_SUPPORT
++FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb/dvb-usb.ko \
++	$(LINUX_DIR)/drivers/media/common/cypress_firmware.ko
++AUTOLOAD:=$(call AutoProbe,dvb-usb)
++endef
++
++define KernelPackage/dvb-usb-v2
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-usb-v2
++KCONFIG:=CONFIG_DVB_USB_V2
++DEPENDS:=+kmod-dvb-core +kmod-i2c-core +kmod-rc-core @USB_SUPPORT
++FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb-v2/dvb_usb_v2.ko
++AUTOLOAD:=$(call AutoProbe,dvb-usb-v2)
++endef
++
++define KernelPackage/dvb-frontends-pll
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-frontends
++KCONFIG:=CONFIG_DVB_PLL
++DEPENDS:=+kmod-dvb-core +kmod-i2c-core
++FILES:=$(LINUX_DIR)/drivers/media/dvb-frontends/dvb-pll.ko
++AUTOLOAD:=$(call AutoProbe,dvb-frontends-pll)
++endef
++
++define KernelPackage/dvb-frontends-dw2102
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-frontends-dw2102
++KCONFIG:= \
++	CONFIG_DVB_STV0299 \
++	CONFIG_DVB_STV0288 \
++	CONFIG_DVB_STB6000 \
++	CONFIG_DVB_CX24116 \
++	CONFIG_DVB_SI21XX \
++	CONFIG_DVB_TDA10023 \
++	CONFIG_DVB_MT312 \
++	CONFIG_DVB_ZL10039 \
++	CONFIG_DVB_DS3000 \
++	CONFIG_DVB_TS2020 \
++	CONFIG_DVB_STB6100 \
++	CONFIG_DVB_STV6110 \
++	CONFIG_DVB_STV0900 \
++	CONFIG_DVB_M88RS2000 \
++	CONFIG_DVB_M88DS3103
++DEPENDS:=+kmod-dvb-core +kmod-i2c-core +kmod-i2c-mux +kmod-regmap-i2c
++FILES:= \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stv0299.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stv0288.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stv0299.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stb6000.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/cx24116.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/si21xx.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/tda10023.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/mt312.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/zl10039.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/ds3000.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/ts2020.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stb6100.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stv6110.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/stv0900.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/m88rs2000.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/m88ds3103.ko
++AUTOLOAD:=$(call AutoProbe,dvb-frontends-dw2102)
++endef
++#frontend M88ds3103 - i2c_mux,regmap-i2c
++#$(LINUX_DIR)/drivers/media/dvb-frontends/.ko
++
++define KernelPackage/dvb-frontends-rtl28xxu
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-frontends-rtl28xxu
++KCONFIG:= \
++	CONFIG_DVB_MN88472 \
++	CONFIG_DVB_MN88473 \
++	CONFIG_DVB_CXD2841ER \
++	CONFIG_DVB_RTL2830 \
++	CONFIG_DVB_RTL2832 \
++	CONFIG_DVB_SI2168 \
++	CONFIG_MEDIA_TUNER_E4000 \
++	CONFIG_MEDIA_TUNER_FC0012 \
++	CONFIG_MEDIA_TUNER_FC0013 \
++	CONFIG_MEDIA_TUNER_FC2580 \
++	CONFIG_MEDIA_TUNER_MXL5005S \
++	CONFIG_MEDIA_TUNER_R820T \
++	CONFIG_MEDIA_TUNER_SI2157 \
++	CONFIG_MEDIA_TUNER_TUA9001
++DEPENDS:=+kmod-dvb-core +kmod-i2c-core +kmod-i2c-mux +kmod-regmap-i2c
++FILES:= \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/mn88472.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/mn88473.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/cxd2841er.ko \
++	$(LINUX_DIR)/drivers/media/dvb-frontends/si2168.ko \
++	$(LINUX_DIR)/drivers/media/tuners/e4000.ko \
++	$(LINUX_DIR)/drivers/media/tuners/fc0012.ko \
++	$(LINUX_DIR)/drivers/media/tuners/fc0013.ko \
++	$(LINUX_DIR)/drivers/media/tuners/mxl5005s.ko \
++	$(LINUX_DIR)/drivers/media/tuners/r820t.ko \
++	$(LINUX_DIR)/drivers/media/tuners/si2157.ko \
++	$(LINUX_DIR)/drivers/media/tuners/tua9001.ko
++AUTOLOAD:=$(call AutoProbe,dvb-frontends-rtl28xxu)
++endef
++
++
++define KernelPackage/tuner-mt2060
++SUBMENU:=$(DVB_MENU)
++TITLE:=tuner-mt2060
++KCONFIG:= \
++	CONFIG_MEDIA_TUNER \
++	CONFIG_MEDIA_TUNER_MT2060
++DEPENDS:=+kmod-dvb-usb +kmod-i2c-core
++FILES:=$(LINUX_DIR)/drivers/media/tuners/mt2060.ko
++AUTOLOAD:=$(call AutoProbe,tuner-mt2060)
++endef
++
++define KernelPackage/tuner-qt1010
++SUBMENU:=$(DVB_MENU)
++TITLE:=tuner-qt1010
++KCONFIG:= \
++	CONFIG_MEDIA_TUNER \
++	CONFIG_MEDIA_TUNER_QT1010
++DEPENDS:=+kmod-dvb-usb +kmod-i2c-core
++FILES:=$(LINUX_DIR)/drivers/media/tuners/qt1010.ko
++AUTOLOAD:=$(call AutoProbe,tuner-qt1010)
++endef
++
++
++
++define KernelPackage/dvb-usb-dw2102
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-usb-dw2102
++KCONFIG:= \
++	CONFIG_DVB_USB_DW2102 \
++	CONFIG_MEDIA_USB_SUPPORT=y
++DEPENDS:=+kmod-dvb-frontends-dw2102 +kmod-dvb-frontends-pll +kmod-dvb-usb
++FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb/dvb-usb-dw2102.ko
++AUTOLOAD:=$(call AutoProbe,dvb-usb-dw2102)
++endef
++
++define KernelPackage/dvb-usb-af9005
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-usb-af9005
++KCONFIG:= \
++	CONFIG_DVB_USB_AF9005 \
++	CONFIG_DVB_USB_AF9005_REMOTE \
++	CONFIG_MEDIA_USB_SUPPORT=y
++DEPENDS:=+kmod-tuner-mt2060 +kmod-tuner-qt1010 +kmod-dvb-usb +kmod-dvb-firmware-af9005
++FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb/dvb-usb-af9005.ko \
++	$(LINUX_DIR)/drivers/media/usb/dvb-usb/dvb-usb-af9005-remote.ko
++AUTOLOAD:=$(call AutoProbe,dvb-usb-af9005)
++endef
++
++define KernelPackage/dvb-usb-rtl28xxu
++SUBMENU:=$(DVB_MENU)
++TITLE:=dvb-usb-rtl28xxu
++KCONFIG:= \
++	CONFIG_DVB_USB_RTL28XXU \
++	CONFIG_MEDIA_USB_SUPPORT=y
++DEPENDS:=+kmod-dvb-frontends-rtl28xxu +kmod-dvb-usb-v2 +kmod-dvb-usb +kmod-i2c-mux \
++	+kmod-tuner-mt2060 \
++	+kmod-tuner-qt1010
++FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb-v2/dvb-usb-rtl28xxu.ko
++AUTOLOAD:=$(call AutoProbe,dvb-usb-rtl28xxu)
++endef
++
++
++$(eval $(call KernelPackage,rc-core))
++$(eval $(call KernelPackage,dvb-core))
++$(eval $(call KernelPackage,dvb-usb))
++$(eval $(call KernelPackage,dvb-usb-v2))
++# Frontends, Tuners
++$(eval $(call KernelPackage,dvb-frontends-pll))
++$(eval $(call KernelPackage,dvb-frontends-dw2102))
++$(eval $(call KernelPackage,dvb-frontends-rtl28xxu))
++#$(eval $(call KernelPackage,tuner-frontends-af9005))
++$(eval $(call KernelPackage,tuner-mt2060))
++$(eval $(call KernelPackage,tuner-qt1010))
++# Devices
++$(eval $(call KernelPackage,dvb-usb-af9005))
++$(eval $(call KernelPackage,dvb-usb-dw2102))
++$(eval $(call KernelPackage,dvb-usb-rtl28xxu))
+-- 
+2.30.1
+

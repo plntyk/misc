@@ -1,0 +1,42 @@
+From 1f0be94dac023ef7cc0b8eb4d8e0688daf636c68 Mon Sep 17 00:00:00 2001
+From: Dirk Neukirchen <dirkneukirchen@web.de>
+Date: Mon, 8 Mar 2021 19:46:57 +0100
+Subject: [PATCH 1/2] video: improve
+
+Signed-off-by: Dirk Neukirchen <dirkneukirchen@web.de>
+---
+ package/kernel/linux/modules/video.mk | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/package/kernel/linux/modules/video.mk b/package/kernel/linux/modules/video.mk
+index c71f0760a6..ae5f438564 100644
+--- a/package/kernel/linux/modules/video.mk
++++ b/package/kernel/linux/modules/video.mk
+@@ -397,6 +397,8 @@ define KernelPackage/video-core
+   KCONFIG:= \
+ 	CONFIG_MEDIA_SUPPORT \
+ 	CONFIG_MEDIA_CAMERA_SUPPORT=y \
++	CONFIG_MEDIA_ANALOG_TV_SUPPORT=y \
++	CONFIG_MEDIA_DIGITAL_TV_SUPPORT=y \
+ 	CONFIG_VIDEO_DEV \
+ 	CONFIG_VIDEO_V4L1=y \
+ 	CONFIG_VIDEO_ALLOW_V4L1=y \
+@@ -435,13 +437,14 @@ define KernelPackage/video-videobuf2
+   KCONFIG:= \
+ 	CONFIG_VIDEOBUF2_CORE \
+ 	CONFIG_VIDEOBUF2_MEMOPS \
++	CONFIG_VIDEOBUF2_V4L2 \
+ 	CONFIG_VIDEOBUF2_VMALLOC
+   FILES:= \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-common.ko \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-v4l2.ko \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-memops.ko \
+ 	$(LINUX_DIR)/drivers/media/common/videobuf2/videobuf2-vmalloc.ko
+-  AUTOLOAD:=$(call AutoLoad,65,videobuf2-core videobuf-v4l2 videobuf2-memops videobuf2-vmalloc)
++  AUTOLOAD:=$(call AutoLoad,65,videobuf2-core videobuf2-v4l2 videobuf2-memops videobuf2-vmalloc)
+   $(call AddDepends/video)
+ endef
+ 
+-- 
+2.30.1
+
