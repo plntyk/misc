@@ -1,0 +1,62 @@
+diff --git a/recording.h b/recording.h
+index 6f26f2f6..718df343 100644
+--- a/recording.h
++++ b/recording.h
+@@ -41,6 +41,11 @@ enum eRecordingUsage {
+   ruCanceled = 0x8000, // the operation has been canceled, waiting for cleanup
+   };
+ 
++// workaround patch for enabling extra features in extrecmenung until vdr 2.5.2 is released
++#ifndef EPGRENAME
++#define EPGRENAME
++#endif
++
+ void RemoveDeletedRecordings(void);
+ void AssertFreeDiskSpace(int Priority = 0, bool Force = false);
+      ///< The special Priority value -1 means that we shall get rid of any
+@@ -74,8 +79,6 @@ private:
+   char *fileName;
+   cRecordingInfo(const cChannel *Channel = NULL, const cEvent *Event = NULL);
+   bool Read(FILE *f);
+-  void SetData(const char *Title, const char *ShortText, const char *Description);
+-  void SetAux(const char *Aux);
+ public:
+   cRecordingInfo(const char *FileName);
+   ~cRecordingInfo();
+@@ -93,6 +96,8 @@ public:
+   bool Write(FILE *f, const char *Prefix = "") const;
+   bool Read(void);
+   bool Write(void) const;
++  void SetData(const char *Title, const char *ShortText, const char *Description);
++  void SetAux(const char *Aux);
+   };
+ 
+ class cRecording : public cListObject {
+@@ -150,7 +155,7 @@ public:
+        ///< Returns the full path name to the recording directory, including the
+        ///< video directory and the actual '*.rec'. For disk file access use.
+   const char *Title(char Delimiter = ' ', bool NewIndicator = false, int Level = -1) const;
+-  const cRecordingInfo *Info(void) const { return info; }
++  cRecordingInfo *Info(void) const { return info; }
+   const char *PrefixFileName(char Prefix);
+   int HierarchyLevels(void) const;
+   void ResetResume(void) const;
+diff --git a/recording.c b/recording.c
+index 17467e36..a7f08a26 100644
+--- a/recording.c
++++ b/recording.c
+@@ -430,11 +430,11 @@ cRecordingInfo::~cRecordingInfo()
+ 
+ void cRecordingInfo::SetData(const char *Title, const char *ShortText, const char *Description)
+ {
+-  if (!isempty(Title))
++  if (Title)
+      ((cEvent *)event)->SetTitle(Title);
+-  if (!isempty(ShortText))
++  if (ShortText)
+      ((cEvent *)event)->SetShortText(ShortText);
+-  if (!isempty(Description))
++  if (Description)
+      ((cEvent *)event)->SetDescription(Description);
+ }
+ 
